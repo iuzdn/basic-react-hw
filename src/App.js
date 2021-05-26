@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useReducer, useState } from 'react';
 import {
   Button,
   Card,
@@ -9,7 +9,7 @@ import {
   Row,
 } from 'react-bootstrap';
 
-const initialTodos = [
+const initialState = [
   { id: 1, description: 'Wash Car' },
   { id: 2, description: 'Feed Cat' },
   { id: 3, description: 'Shopping' },
@@ -20,15 +20,26 @@ const initialTodo = {
   description: '',
 };
 
+function reducer(state, action) {
+  switch (action.type) {
+    case 'addTodo':
+      return [...state, action.payload];
+    case 'removeTodo':
+      return [...state.filter(item => item.id !== action.payload)];
+    default:
+      throw new Error();
+  }
+}
+
 function App() {
   const [todo, setTodo] = useState(initialTodo);
-  const [todos, setTodos] = useState(initialTodos);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const { id, description } = todo;
 
   function createId() {
     const newId =
-      todos.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
+      state.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
     return newId;
   }
 
@@ -41,13 +52,9 @@ function App() {
   }
 
   function handleSubmit(e) {
-    setTodos([...todos, todo]);
+    dispatch({ type: 'addTodo', payload: todo });
     setTodo(initialTodo);
     e.preventDefault();
-  }
-
-  function handleDelete(id) {
-    setTodos(todos.filter(item => item.id !== id));
   }
 
   return (
@@ -75,14 +82,16 @@ function App() {
           <Card>
             <Card.Header>ToDoList</Card.Header>
             <ListGroup>
-              {todos.map(({ id, description }) => (
+              {state.map(({ id, description }) => (
                 <ListGroup.Item key={id}>
                   <Row>
                     <Col>{description}</Col>
                     <Button
                       variant="danger"
                       className="mr-2"
-                      onClick={() => handleDelete(id)}
+                      onClick={() =>
+                        dispatch({ type: 'removeTodo', payload: id })
+                      }
                     >
                       Delete
                     </Button>
