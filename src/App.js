@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react';
+import { useCallback, useReducer, useState } from 'react';
 import {
   Button,
   Card,
@@ -37,19 +37,22 @@ function App() {
 
   const { id, description } = todo;
 
-  function createId() {
+  const createId = useCallback(() => {
     const newId =
       state.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
     return newId;
-  }
+  }, [state]);
 
-  function handleChange(e) {
-    const updatedTodo = id
-      ? { ...todo, description: e.target.value }
-      : { id: createId(), description: e.target.value };
-    setTodo(updatedTodo);
-    console.log(todo);
-  }
+  const handleChange = useCallback(
+    e => {
+      const updatedTodo = id
+        ? { ...todo, description: e.target.value }
+        : { id: createId(), description: e.target.value };
+      setTodo(updatedTodo);
+      console.log(todo);
+    },
+    [id, todo, createId]
+  );
 
   function handleSubmit(e) {
     dispatch({ type: 'addTodo', payload: todo });
