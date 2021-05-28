@@ -1,4 +1,4 @@
-import { useCallback, useReducer, useState } from 'react';
+import { useReducer, useState } from 'react';
 import {
   Button,
   Card,
@@ -8,57 +8,46 @@ import {
   ListGroup,
   Row,
 } from 'react-bootstrap';
+import reducer, { initialState } from './reducers';
 
-const initialState = [
-  { id: 1, description: 'Wash Car' },
-  { id: 2, description: 'Feed Cat' },
-  { id: 3, description: 'Shopping' },
-];
-
-const initialTodo = {
-  id: null,
-  description: '',
-};
-
-function reducer(state, action) {
-  switch (action.type) {
-    case 'addTodo':
-      return [...state, action.payload];
-    case 'removeTodo':
-      return [...state.filter(item => item.id !== action.payload)];
-    default:
-      throw new Error();
-  }
-}
+import {
+  ADD_TODO,
+  SELECT_TODO,
+  UPDATE_TODO,
+  CHANGE_TODO_STATUS,
+  REMOVE_TODO,
+} from './constants';
 
 function App() {
-  const [todo, setTodo] = useState(initialTodo);
+  const [input, setInput] = useState('');
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const { id, description } = todo;
+  const { selectedTodoId, allTodos } = state;
 
-  const createId = useCallback(() => {
-    const newId =
-      state.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
-    return newId;
-  }, [state]);
+  const handleChange = e => {
+    setInput(e.target.value);
+  };
 
-  const handleChange = useCallback(
-    e => {
-      const updatedTodo = id
-        ? { ...todo, description: e.target.value }
-        : { id: createId(), description: e.target.value };
-      setTodo(updatedTodo);
-      console.log(todo);
-    },
-    [id, todo, createId]
-  );
+  const handleChangeStatus = (id, status) => {
+    dispatch({ type: CHANGE_TODO_STATUS, payload: { id, status } });
+  };
 
-  function handleSubmit(e) {
-    dispatch({ type: 'addTodo', payload: todo });
-    setTodo(initialTodo);
+  const handleSubmit = e => {
+    selectedTodoId
+      ? dispatch({ type: UPDATE_TODO, payload: input })
+      : dispatch({ type: ADD_TODO, payload: input });
+    setInput('');
     e.preventDefault();
-  }
+  };
+
+  const handleSelect = (id, desc) => {
+    dispatch({ type: SELECT_TODO, payload: id });
+    setInput(desc);
+  };
+
+  const handleDelete = id => {
+    dispatch({ type: REMOVE_TODO, payload: id });
+  };
 
   return (
     <Container className="mt-5">
@@ -70,39 +59,69 @@ function App() {
               <Form.Group as={Col}>
                 <Form.Control
                   type="text"
-                  value={description}
+                  value={input}
                   placeholder="Enter todo"
                   onChange={handleChange}
                 />
               </Form.Group>
               <Form.Group as={Col}>
-                <Button type="submit">Add Todo</Button>
+                <Button type="submit">
+                  {!selectedTodoId ? 'Add Todo' : 'Update Todo'}
+                </Button>
               </Form.Group>
             </Form.Group>
           </Form>
         </Col>
         <Col>
-          <Card>
-            <Card.Header>ToDoList</Card.Header>
-            <ListGroup>
-              {state.map(({ id, description }) => (
-                <ListGroup.Item key={id}>
-                  <Row>
-                    <Col>{description}</Col>
-                    <Button
-                      variant="danger"
-                      className="mr-2"
-                      onClick={() =>
-                        dispatch({ type: 'removeTodo', payload: id })
-                      }
-                    >
-                      Delete
-                    </Button>
-                  </Row>
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
-          </Card>
+          <Form>
+            <Card>
+              <Card.Header>ToDoList</Card.Header>
+              <ListGroup>
+                {allTodos.map(({ id, description, statusDone }) => (
+                  <ListGroup.Item key={id}>
+                    <Row>
+                      <Col>
+                        <Form.Check controlId="formBasicCheckbox">
+                          <Form.Check.Input
+                            type="checkbox"
+                            checked={statusDone}
+                            onChange={() => handleChangeStatus(id, statusDone)}
+                          />
+                          <Form.Check.Label
+                            style={
+                              statusDone
+                                ? { textDecoration: 'line-through' }
+                                : { textDecoration: 'none' }
+                            }
+                          >
+                            {description}
+                          </Form.Check.Label>
+                        </Form.Check>
+                      </Col>
+                      <Col className="justify-content-end">
+                        <Button
+                          variant="primary"
+                          className="mr-2"
+                          onClick={() => handleSelect(id, description)}
+                          disabled={statusDone}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          className="mr-2"
+                          onClick={() => handleDelete(id)}
+                          disabled={statusDone}
+                        >
+                          Delete
+                        </Button>
+                      </Col>
+                    </Row>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            </Card>
+          </Form>
         </Col>
       </Row>
     </Container>
