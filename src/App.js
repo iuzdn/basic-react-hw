@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import {
   Button,
   Card,
@@ -12,9 +12,10 @@ import reducer, { initialState } from './reducers';
 
 import {
   ADD_TODO,
+  SORT_TODOS,
   SELECT_TODO,
-  UPDATE_TODO,
-  CHANGE_TODO_STATUS,
+  UPDATE_TODO_DESC,
+  UPDATE_TODO_STATUS,
   REMOVE_TODO,
 } from './constants';
 
@@ -27,21 +28,28 @@ function App() {
     dispatch({ type: type, payload: payload });
   };
 
-  console.log(error);
+  const sortItems = useCallback(() => dispatchAction(SORT_TODOS), []);
+
+  useEffect(() => {
+    sortItems();
+  }, [sortItems]);
+
+  useEffect(() => {
+    !error && setInput('');
+  }, [error]);
 
   const handleChange = e => {
     setInput(e.target.value);
   };
 
   const handleChangeStatus = (id, status) => {
-    dispatchAction(CHANGE_TODO_STATUS, { id, status });
+    dispatchAction(UPDATE_TODO_STATUS, { id, status });
   };
 
   const handleSubmit = e => {
     selectedTodoId
-      ? dispatchAction(UPDATE_TODO, input)
+      ? dispatchAction(UPDATE_TODO_DESC, input)
       : dispatchAction(ADD_TODO, input);
-    setInput('');
     e.preventDefault();
   };
 
@@ -69,7 +77,11 @@ function App() {
                   onChange={handleChange}
                   isInvalid={!!error}
                 />
-                <Form.Control.Feedback type="invalid" tooltip={true}>
+                <Form.Control.Feedback
+                  style={{ left: '1rem' }}
+                  type="invalid"
+                  tooltip={true}
+                >
                   {error}
                 </Form.Control.Feedback>
               </Form.Group>
