@@ -5,10 +5,14 @@ import {
   RESET_TODO,
   CHANGE_TODO_STATUS,
   REMOVE_TODO,
+  VALUE_EXISTS,
+  DESCRIPTION,
+  STATUS_DONE,
 } from './constants';
 
 export const initialState = {
   selectedTodoId: null,
+  error: null,
   allTodos: [
     { id: 1, description: 'Wash Car', statusDone: false },
     { id: 2, description: 'Feed Cat', statusDone: false },
@@ -24,9 +28,29 @@ export default function reducer(state, { type, payload }) {
   };
 
   const addTodo = () => {
-    const newTodo = { id: createId(), description: payload, statusDone: false };
+    if (checkExisting()) {
+      return triggerError(VALUE_EXISTS);
+    }
+    const newTodo = {
+      id: createId(),
+      description: payload,
+      statusDone: false,
+    };
     const newFilteredArr = sortTodos([...state.allTodos, newTodo]);
-    return { ...state, allTodos: [...newFilteredArr] };
+    return { ...state, error: null, allTodos: [...newFilteredArr] };
+  };
+
+  //Checks if todo exists and returns true if todo exists
+  const checkExisting = () => {
+    const itemIdx = state.allTodos.findIndex(
+      itm => itm.description.toLowerCase() === payload.toLowerCase()
+    );
+    console.log(itemIdx);
+    return itemIdx > 0 ? true : false;
+  };
+
+  const triggerError = errorMsg => {
+    return { ...state, error: errorMsg };
   };
 
   const selectTodo = id => {
@@ -34,11 +58,14 @@ export default function reducer(state, { type, payload }) {
   };
 
   const updateTodo = () => {
-    return findAndUpdate(state.selectedTodoId, 'description', payload);
+    if (checkExisting) {
+      return triggerError(VALUE_EXISTS);
+    }
+    return findAndUpdate(state.selectedTodoId, DESCRIPTION, payload);
   };
 
   const changeStatus = ({ id, status }) => {
-    return findAndUpdate(id, 'statusDone', !status);
+    return findAndUpdate(id, STATUS_DONE, !status);
   };
 
   const findAndUpdate = (id, key, value) => {
@@ -50,7 +77,7 @@ export default function reducer(state, { type, payload }) {
       }
     });
     const sortedArr = sortTodos(updatedTodos);
-    return { selectedTodoId: null, allTodos: [...sortedArr] };
+    return { error: null, selectedTodoId: null, allTodos: [...sortedArr] };
   };
 
   const sortTodos = todos => {

@@ -6,3 +6,8 @@ export const CHANGE_TODO_STATUS = 'changeStatus';
 export const SORT_TODOS = 'sortTodos';
 export const REMOVE_TODO = 'removeTodo';
 export const CREATE_NEW_ID = 'createId';
+
+export const VALUE_EXISTS = 'A similar todo allready exists';
+
+export const DESCRIPTION = 'description';
+export const STATUS_DONE = 'statusDone';

@@ -22,31 +22,36 @@ function App() {
   const [input, setInput] = useState('');
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const { selectedTodoId, allTodos } = state;
+  const { error, selectedTodoId, allTodos } = state;
+  const dispatchAction = (type, payload) => {
+    dispatch({ type: type, payload: payload });
+  };
+
+  console.log(error);
 
   const handleChange = e => {
     setInput(e.target.value);
   };
 
   const handleChangeStatus = (id, status) => {
-    dispatch({ type: CHANGE_TODO_STATUS, payload: { id, status } });
+    dispatchAction(CHANGE_TODO_STATUS, { id, status });
   };
 
   const handleSubmit = e => {
     selectedTodoId
-      ? dispatch({ type: UPDATE_TODO, payload: input })
-      : dispatch({ type: ADD_TODO, payload: input });
+      ? dispatchAction(UPDATE_TODO, input)
+      : dispatchAction(ADD_TODO, input);
     setInput('');
     e.preventDefault();
   };
 
   const handleSelect = (id, desc) => {
-    dispatch({ type: SELECT_TODO, payload: id });
+    dispatchAction(SELECT_TODO, id);
     setInput(desc);
   };
 
   const handleDelete = id => {
-    dispatch({ type: REMOVE_TODO, payload: id });
+    dispatchAction(REMOVE_TODO, id);
   };
 
   return (
@@ -62,7 +67,11 @@ function App() {
                   value={input}
                   placeholder="Enter todo"
                   onChange={handleChange}
+                  isInvalid={!!error}
                 />
+                <Form.Control.Feedback type="invalid" tooltip={true}>
+                  {error}
+                </Form.Control.Feedback>
               </Form.Group>
               <Form.Group as={Col}>
                 <Button type="submit">
