@@ -1,11 +1,12 @@
-export const ADD_TODO = 'addTodo';
-export const UPDATE_TODO_DESC = 'updateTodo';
-export const UPDATE_TODO_STATUS = 'updateTodoStatus';
-export const SORT_TODOS = 'sortTodos';
-export const SELECT_TODO = 'selectTodo';
-export const REMOVE_TODO = 'removeTodo';
-
-export const VALUE_EXISTS = 'A similar todo allready exists';
-
-export const DESCRIPTION = 'description';
-export const STATUS_DONE = 'statusDone';
+export const ACTION_CONSTANTS = {
+  SET_INPUT: 'setInput',
+  ADD_TODO: 'addTodo',
+  UPDATE_TODO_DESC: 'updateTodo',
+  UPDATE_TODO_STATUS: 'updateTodoStatus',
+  SORT_TODOS: 'sortTodos',
+  SELECT_TODO: 'selectTodo',
+  REMOVE_TODO: 'removeTodo',
+  DESCRIPTION: 'description',
+  STATUS_DONE: 'statusDone',
+  VALUE_EXISTS: 'A similar todo allready exists',
+};

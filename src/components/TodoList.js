@@ -1,17 +1,37 @@
-import React from 'react';
-import { useTodosContext } from '../utils/context';
+import React, { useCallback, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  updateStatus,
+  sortTodos,
+  selectTodo,
+  deleteTodo,
+  setInput,
+} from '../utils/actions';
 
 import { Button, Card, Col, Form, ListGroup, Row } from 'react-bootstrap';
 
 export default function TodoList() {
-  const {
-    allTodos,
-    functions: { handleChangeStatus, handleSelect, handleDelete },
-  } = useTodosContext();
+  const dispatch = useDispatch();
+  const { allTodos } = useSelector(state => state);
+
+  const sortItems = useCallback(() => dispatch(sortTodos()), [dispatch]);
+
+  useEffect(() => {
+    sortItems();
+  }, [sortItems]);
+
+  const handleSelect = (id, desc) => {
+    dispatch(selectTodo(id));
+    dispatch(setInput(desc));
+  };
+
+  const handleDelete = id => {
+    dispatch(deleteTodo(id));
+  };
 
   return (
-    <Col>
-      <Form>
+    <Row>
+      <Col>
         <Card>
           <Card.Header>ToDoList</Card.Header>
           <ListGroup>
@@ -23,7 +43,7 @@ export default function TodoList() {
                       <Form.Check.Input
                         type="checkbox"
                         checked={statusDone}
-                        onChange={() => handleChangeStatus(id, statusDone)}
+                        onChange={() => dispatch(updateStatus(id, statusDone))}
                       />
                       <Form.Check.Label
                         style={
@@ -36,7 +56,7 @@ export default function TodoList() {
                       </Form.Check.Label>
                     </Form.Check>
                   </Col>
-                  <Col className="justify-content-end">
+                  <Col className="d-flex justify-content-end">
                     <Button
                       variant="primary"
                       className="mr-2"
@@ -59,7 +79,7 @@ export default function TodoList() {
             ))}
           </ListGroup>
         </Card>
-      </Form>
-    </Col>
+      </Col>
+    </Row>
   );
 }

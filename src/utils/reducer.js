@@ -1,4 +1,7 @@
-import {
+import { ACTION_CONSTANTS } from './constants';
+
+const {
+  SET_INPUT,
   ADD_TODO,
   SELECT_TODO,
   SORT_TODOS,
@@ -8,7 +11,11 @@ import {
   VALUE_EXISTS,
   DESCRIPTION,
   STATUS_DONE,
-} from './constants';
+} = ACTION_CONSTANTS;
+
+const setInput = (state, input) => {
+  return { ...state, input };
+};
 
 const createId = todos => {
   return todos.reduce((max, { id }) => Math.max(max, id), 0) + 1;
@@ -46,6 +53,7 @@ const selectTodo = (state, id) => {
 
 const updateDesc = (state, desc) => {
   if (checkExisting(state.allTodos, desc)) {
+    console.log('error');
     return triggerError(state, VALUE_EXISTS);
   }
   return findAndUpdate(state, {
@@ -56,6 +64,7 @@ const updateDesc = (state, desc) => {
 };
 
 const updateStatus = (state, { id, status }) => {
+  console.log(state, id, status);
   return findAndUpdate(state, { id, key: STATUS_DONE, value: !status });
 };
 
@@ -67,11 +76,12 @@ const findAndUpdate = (state, { id, key, value }) => {
       return item;
     }
   });
+
   return sortTodos(resetState(state), updatedTodos);
 };
 
 const resetState = state => {
-  return { ...state, error: null, selectedTodoId: null };
+  return { ...state, error: null, selectedTodoId: null, input: '' };
 };
 
 const sortTodos = (state, todos) => {
@@ -80,7 +90,7 @@ const sortTodos = (state, todos) => {
     const _b = b.statusDone;
     return _a === _b ? 0 : _a > _b ? 1 : -1;
   });
-
+  console.log(sortedArr);
   return { ...state, allTodos: [...sortedArr] };
 };
 
@@ -92,6 +102,7 @@ const removeTodo = (state, id) => {
 };
 
 export const initialState = {
+  input: '',
   selectedTodoId: null,
   error: null,
   allTodos: [
@@ -103,8 +114,10 @@ export const initialState = {
   ],
 };
 
-export default function reducer(state, { type, payload }) {
+export default function reducer(state = initialState, { type, payload }) {
   switch (type) {
+    case SET_INPUT:
+      return setInput(state, payload);
     case ADD_TODO:
       return addTodo(state, payload);
     case SELECT_TODO:
@@ -118,6 +131,6 @@ export default function reducer(state, { type, payload }) {
     case REMOVE_TODO:
       return removeTodo(state, payload);
     default:
-      throw new Error();
+      return state;
   }
 }

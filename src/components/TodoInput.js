@@ -1,46 +1,38 @@
-import React from 'react';
-import { useTodosContext } from '../utils/context';
-
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button, Col, Form, Row } from 'react-bootstrap';
+import { setInput } from '../utils/actions';
 
 export default function TodoInput() {
-  const {
-    input,
-    error,
-    selectedTodoId,
-    inputEl,
-    functions: { handleChange, handleSubmit },
-  } = useTodosContext();
+  const { input, error, selectedTodoId } = useSelector(state => state);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    !error && dispatch(setInput(''));
+  }, [error, dispatch]);
 
   return (
-    <Col>
-      <Form onSubmit={handleSubmit}>
+    <Form.Group as={Row} controlId="formBasicTodo">
+      <Form.Group as={Col}>
         <Form.Label>Todo input:</Form.Label>
-        <Form.Group as={Row} controlId="formBasicTodo">
-          <Form.Group as={Col}>
-            <Form.Control
-              ref={inputEl}
-              type="text"
-              value={input}
-              placeholder="Enter todo"
-              onChange={handleChange}
-              isInvalid={!!error}
-            />
-            <Form.Control.Feedback
-              style={{ left: '1rem' }}
-              type="invalid"
-              tooltip={true}
-            >
-              {error}
-            </Form.Control.Feedback>
-          </Form.Group>
-          <Form.Group as={Col}>
-            <Button type="submit">
-              {!selectedTodoId ? 'Add Todo' : 'Update Todo'}
-            </Button>
-          </Form.Group>
-        </Form.Group>
-      </Form>
-    </Col>
+        <Form.Control
+          type="text"
+          value={input}
+          placeholder="Enter todo"
+          onChange={e => dispatch(setInput(e.target.value))}
+          isInvalid={!!error}
+        />
+        <Form.Control.Feedback
+          style={{ left: '1rem' }}
+          type="invalid"
+          tooltip={true}
+        >
+          {error}
+        </Form.Control.Feedback>
+        <br />
+        <Button type="submit">
+          {!selectedTodoId ? 'Add Todo' : 'Update Todo'}
+        </Button>
+      </Form.Group>
+    </Form.Group>
   );
 }
