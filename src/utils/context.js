@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useReducer, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 import reducer, { initialState } from './reducers';
 import {
   ADD_TODO,
@@ -13,6 +19,7 @@ const TodosContext = React.createContext({});
 
 export function TodosContextProvider(props) {
   const [input, setInput] = useState('');
+  const inputEl = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const { error, selectedTodoId, allTodos } = state;
@@ -48,6 +55,7 @@ export function TodosContextProvider(props) {
   const handleSelect = (id, desc) => {
     dispatchAction(SELECT_TODO, id);
     setInput(desc);
+    inputEl.current.focus();
   };
 
   const handleDelete = id => {
@@ -59,6 +67,7 @@ export function TodosContextProvider(props) {
     error,
     selectedTodoId,
     allTodos,
+    inputEl,
     functions: {
       handleChange,
       handleChangeStatus,

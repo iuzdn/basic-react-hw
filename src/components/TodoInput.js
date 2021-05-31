@@ -8,6 +8,7 @@ export default function TodoInput() {
     input,
     error,
     selectedTodoId,
+    inputEl,
     functions: { handleChange, handleSubmit },
   } = useTodosContext();
 
@@ -18,6 +19,7 @@ export default function TodoInput() {
         <Form.Group as={Row} controlId="formBasicTodo">
           <Form.Group as={Col}>
             <Form.Control
+              ref={inputEl}
               type="text"
               value={input}
               placeholder="Enter todo"
