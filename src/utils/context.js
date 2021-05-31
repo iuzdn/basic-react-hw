@@ -1,6 +1,7 @@
 import React, {
   useCallback,
   useEffect,
+  useMemo,
   useReducer,
   useRef,
   useState,
@@ -45,12 +46,15 @@ export function TodosContextProvider(props) {
     dispatchAction(UPDATE_TODO_STATUS, { id, status });
   };
 
-  const handleSubmit = e => {
-    selectedTodoId
-      ? dispatchAction(UPDATE_TODO_DESC, input)
-      : dispatchAction(ADD_TODO, input);
-    e.preventDefault();
-  };
+  const handleSubmit = useMemo(
+    () => e => {
+      selectedTodoId
+        ? dispatchAction(UPDATE_TODO_DESC, input)
+        : dispatchAction(ADD_TODO, input);
+      e.preventDefault();
+    },
+    [selectedTodoId, input]
+  );
 
   const handleSelect = (id, desc) => {
     dispatchAction(SELECT_TODO, id);

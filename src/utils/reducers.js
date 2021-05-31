@@ -15,7 +15,8 @@ const createId = todos => {
 };
 
 const addTodo = (state, description) => {
-  if (checkExisting(state.allTodos, description)) {
+  const itemExists = checkExisting(state.allTodos, description);
+  if (itemExists) {
     return triggerError(state, VALUE_EXISTS);
   }
   const newTodo = {
