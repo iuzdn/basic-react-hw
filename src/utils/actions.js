@@ -8,6 +8,10 @@ const {
   SORT_TODOS,
   SELECT_TODO,
   REMOVE_TODO,
+  FETCH_TODOS,
+  RECEIVE_TODOS_SUCCESS,
+  RECEIVE_TODOS_FAILURE,
+  TRIGGER_LOADING,
 } = ACTION_CONSTANTS;
 
 export const setInput = value => {
@@ -58,5 +62,41 @@ export const deleteTodo = id => {
   return {
     type: REMOVE_TODO,
     payload: id,
+  };
+};
+
+export const fetchTodos = () => {
+  return {
+    type: FETCH_TODOS,
+  };
+};
+
+export const receiveTodosSuccess = todos => {
+  return {
+    type: RECEIVE_TODOS_SUCCESS,
+    payload: {
+      todos,
+      error: null,
+      loading: false,
+    },
+  };
+};
+
+export const receiveTodosFailure = error => {
+  return {
+    type: RECEIVE_TODOS_FAILURE,
+    payload: {
+      error,
+      loading: false,
+    },
+  };
+};
+
+export const triggerLoading = () => {
+  return {
+    type: TRIGGER_LOADING,
+    payload: {
+      loading: true,
+    },
   };
 };

@@ -9,4 +9,8 @@ export const ACTION_CONSTANTS = {
   DESCRIPTION: 'description',
   STATUS_DONE: 'statusDone',
   VALUE_EXISTS: 'A similar todo allready exists',
+  FETCH_TODOS: 'todos/fetch',
+  RECEIVE_TODOS_SUCCESS: 'todos/fetchSuccess',
+  RECEIVE_TODOS_FAILURE: 'todos/fetchfailure',
+  TRIGGER_LOADING: 'todos/loading',
 };

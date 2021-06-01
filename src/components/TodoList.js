@@ -1,24 +1,22 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   updateStatus,
-  sortTodos,
   selectTodo,
   deleteTodo,
   setInput,
+  fetchTodos,
 } from '../utils/actions';
 
 import { Button, Card, Col, Form, ListGroup, Row } from 'react-bootstrap';
 
 export default function TodoList() {
   const dispatch = useDispatch();
-  const { allTodos } = useSelector(state => state);
-
-  const sortItems = useCallback(() => dispatch(sortTodos()), [dispatch]);
+  const { allTodos, loading } = useSelector(state => state);
 
   useEffect(() => {
-    sortItems();
-  }, [sortItems]);
+    dispatch(fetchTodos());
+  }, [dispatch]);
 
   const handleSelect = (id, desc) => {
     dispatch(selectTodo(id));
@@ -28,6 +26,16 @@ export default function TodoList() {
   const handleDelete = id => {
     dispatch(deleteTodo(id));
   };
+
+  if (loading) {
+    return (
+      <Row>
+        <Col>
+          <h2>Loading...</h2>
+        </Col>
+      </Row>
+    );
+  }
 
   return (
     <Row>

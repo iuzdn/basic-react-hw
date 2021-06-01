@@ -11,6 +11,9 @@ const {
   VALUE_EXISTS,
   DESCRIPTION,
   STATUS_DONE,
+  RECEIVE_TODOS_SUCCESS,
+  RECEIVE_TODOS_FAILURE,
+  TRIGGER_LOADING,
 } = ACTION_CONSTANTS;
 
 const setInput = (state, input) => {
@@ -64,7 +67,6 @@ const updateDesc = (state, desc) => {
 };
 
 const updateStatus = (state, { id, status }) => {
-  console.log(state, id, status);
   return findAndUpdate(state, { id, key: STATUS_DONE, value: !status });
 };
 
@@ -90,7 +92,6 @@ const sortTodos = (state, todos) => {
     const _b = b.statusDone;
     return _a === _b ? 0 : _a > _b ? 1 : -1;
   });
-  console.log(sortedArr);
   return { ...state, allTodos: [...sortedArr] };
 };
 
@@ -101,17 +102,32 @@ const removeTodo = (state, id) => {
   };
 };
 
+const triggerLoading = (state, payload) => {
+  return {
+    ...state,
+    loading: payload.loading,
+  };
+};
+
+const receiveTodosSuccess = (state, payload) => {
+  return {
+    ...state,
+    allTodos: payload.todos,
+    loading: payload.loading,
+    error: payload.error,
+  };
+};
+
+const receiveTodosFailure = (state, { error, loading }) => {
+  return { ...state, error, loading };
+};
+
 export const initialState = {
   input: '',
   selectedTodoId: null,
   error: null,
-  allTodos: [
-    { id: 1, description: 'Wash Car', statusDone: true },
-    { id: 2, description: 'Feed Cat', statusDone: false },
-    { id: 3, description: 'Shopping', statusDone: true },
-    { id: 4, description: 'Haircut', statusDone: false },
-    { id: 5, description: 'Learn to code', statusDone: false },
-  ],
+  loading: false,
+  allTodos: [],
 };
 
 export default function reducer(state = initialState, { type, payload }) {
@@ -130,6 +146,12 @@ export default function reducer(state = initialState, { type, payload }) {
       return updateStatus(state, payload);
     case REMOVE_TODO:
       return removeTodo(state, payload);
+    case RECEIVE_TODOS_SUCCESS:
+      return receiveTodosSuccess(state, payload);
+    case RECEIVE_TODOS_FAILURE:
+      return receiveTodosFailure(state, payload);
+    case TRIGGER_LOADING:
+      return triggerLoading(state, payload);
     default:
       return state;
   }
