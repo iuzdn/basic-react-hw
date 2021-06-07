@@ -1,33 +1,33 @@
-import React, { useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  updateStatus,
-  sortTodos,
-  selectTodo,
-  deleteTodo,
-  setInput,
-} from '../utils/actions';
+import React from 'react';
 
 import { Button, Card, Col, Form, ListGroup, Row } from 'react-bootstrap';
 
+import { useTodoContext } from '../hooks/useContext';
+import useTodos from '../hooks/useTodos';
+
 export default function TodoList() {
-  const dispatch = useDispatch();
-  const { allTodos } = useSelector(state => state);
+  const { todo, setTodo } = useTodoContext();
+  const {
+    updateTodo: { mutate: checkTodo },
+    deleteTodo: { mutate: deleteTodo },
+    todos: { isLoading, error, data },
+  } = useTodos();
 
-  const sortItems = useCallback(() => dispatch(sortTodos()), [dispatch]);
+  const handleSelect = (id, description) => {
+    setTodo({ ...todo, id, fields: { description } });
+  };
 
-  useEffect(() => {
-    sortItems();
-  }, [sortItems]);
-
-  const handleSelect = (id, desc) => {
-    dispatch(selectTodo(id));
-    dispatch(setInput(desc));
+  const handleCheck = (id, completed) => {
+    checkTodo({ ...todo, id, fields: { completed } });
   };
 
   const handleDelete = id => {
-    dispatch(deleteTodo(id));
+    deleteTodo(id);
   };
+
+  if (isLoading) return 'Loading...';
+
+  if (error) return 'An error has occured: ' + error.message;
 
   return (
     <Row>
@@ -35,33 +35,35 @@ export default function TodoList() {
         <Card>
           <Card.Header>ToDoList</Card.Header>
           <ListGroup>
-            {allTodos.map(({ id, description, statusDone }) => (
+            {data.map(({ id, fields: { description, completed = false } }) => (
               <ListGroup.Item key={id}>
                 <Row>
                   <Col>
-                    <Form.Check controlId="formBasicCheckbox">
-                      <Form.Check.Input
-                        type="checkbox"
-                        checked={statusDone}
-                        onChange={() => dispatch(updateStatus(id, statusDone))}
-                      />
-                      <Form.Check.Label
-                        style={
-                          statusDone
-                            ? { textDecoration: 'line-through' }
-                            : { textDecoration: 'none' }
-                        }
-                      >
-                        {description}
-                      </Form.Check.Label>
-                    </Form.Check>
+                    <Form>
+                      <Form.Check controlId="formBasicCheckbox">
+                        <Form.Check.Input
+                          type="checkbox"
+                          checked={completed}
+                          onChange={() => handleCheck(id, !completed)}
+                        />
+                        <Form.Check.Label
+                          style={
+                            completed
+                              ? { textDecoration: 'line-through' }
+                              : { textDecoration: 'none' }
+                          }
+                        >
+                          {description}
+                        </Form.Check.Label>
+                      </Form.Check>
+                    </Form>
                   </Col>
                   <Col className="d-flex justify-content-end">
                     <Button
                       variant="primary"
                       className="mr-2"
                       onClick={() => handleSelect(id, description)}
-                      disabled={statusDone}
+                      disabled={completed}
                     >
                       Edit
                     </Button>
@@ -69,7 +71,7 @@ export default function TodoList() {
                       variant="danger"
                       className="mr-2"
                       onClick={() => handleDelete(id)}
-                      disabled={statusDone}
+                      disabled={completed}
                     >
                       Delete
                     </Button>
