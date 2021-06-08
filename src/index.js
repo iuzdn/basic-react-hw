@@ -2,9 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import './utils/airtable.config';
 
 import { Provider } from 'react-redux';
-import store from './utils/saga';
+import store from './redux/saga';
 
 ReactDOM.render(
   <React.StrictMode>

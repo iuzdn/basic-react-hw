@@ -1,11 +1,13 @@
 import { Container } from 'react-bootstrap';
 
-import TodoForm from './components/TodoForm';
+import TodoInput from './components/TodoInput';
+import TodoList from './components/TodoList';
 
 function App() {
   return (
     <Container className="mt-5">
-      <TodoForm />
+      <TodoInput />
+      <TodoList />
     </Container>
   );
 }
