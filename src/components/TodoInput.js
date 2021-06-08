@@ -5,34 +5,13 @@ import { useTodoContext } from '../hooks/useContext';
 import useTodos from '../hooks/useTodos';
 
 export default function TodoInput() {
-  const { todo, setTodo } = useTodoContext();
-  const {
-    addTodo: {
-      mutate: addTodo,
-      isError: addIsError,
-      error: addError,
-      isLoading: addIsLoading,
-    },
-    updateTodo: {
-      mutate: updateTodo,
-      isError: updateIsError,
-      error: updateError,
-      isLoading: updateIsLoading,
-    },
-  } = useTodos();
-
-  const {
-    id,
-    fields: { description },
-  } = todo;
-
-  const handleChange = value => {
-    setTodo({ ...todo, fields: { description: value } });
-  };
+  const { message, isLoading, isError, isSuccess, todo, setTodo } =
+    useTodoContext();
+  const { addTodo, updateTodo } = useTodos();
 
   const handleSubmit = e => {
     e.preventDefault();
-    id ? updateTodo(todo) : addTodo(description);
+    todo.id ? updateTodo(todo) : addTodo(todo);
   };
 
   return (
@@ -42,25 +21,27 @@ export default function TodoInput() {
           <Form.Label>Todo input:</Form.Label>
           <Form.Control
             type="text"
-            value={description}
+            value={todo.fields.description}
             placeholder="Enter todo"
-            onChange={e => handleChange(e.target.value)}
-            isInvalid={addIsError || updateIsError}
+            onChange={e =>
+              setTodo({ ...todo, fields: { description: e.target.value } })
+            }
           />
-          {(addIsError || updateIsError) && (
-            <Form.Control.Feedback
-              style={{ left: '1rem' }}
-              type="invalid"
-              tooltip={true}
-            >
-              {addError.message || updateError.message}
-            </Form.Control.Feedback>
-          )}
-
-          <br />
-          <Button type="submit">{!id ? 'Add Todo' : 'Update Todo'}</Button>
-          {(addIsLoading || updateIsLoading) && <span>Loading...</span>}
         </Form.Group>
+      </Form.Group>
+      <Form.Group as={Row} controlId="formBasicTodoButton">
+        <Col xs="4">
+          <Button type="submit">{!todo.id ? 'Add Todo' : 'Update Todo'}</Button>
+        </Col>
+        <Col xs="8">
+          <Form.Control
+            type="text"
+            placeholder={isLoading ? 'Loading...' : message || ''}
+            isInvalid={isError || false}
+            isValid={isSuccess || false}
+            readOnly
+          />
+        </Col>
       </Form.Group>
     </Form>
   );
